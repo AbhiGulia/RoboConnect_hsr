@@ -16,6 +16,11 @@ from tmc_suction.msg import SuctionControlAction, SuctionControlGoal
 from tmc_control_msgs.msg import GripperApplyEffortAction, GripperApplyEffortGoal
 from hsrb_autocharge.msg import DockChargeStationAction, DockChargeStationGoal
 
+GOAL_TIMEOUT_SEC = 120
+POSITION_TOLERANCE_METERS = 0.25
+YAW_TOLERANCE_RAD = 0.26
+EMERGENCY_PUBLISH_DELAY_SEC = 0.1
+
 
 class HSRActionManager:
     def __init__(self, location_store):
@@ -27,6 +32,7 @@ class HSRActionManager:
         self.suction_client = actionlib.SimpleActionClient("/hsrb/suction_control", SuctionControlAction)
         self.gripper_client = actionlib.SimpleActionClient("/hsrb/gripper_controller/grasp", GripperApplyEffortAction)
         self.dock_client = actionlib.SimpleActionClient("/hsrb/autocharge_node/dock", DockChargeStationAction)
+        self._vel_pub = rospy.Publisher("/hsrb/command_velocity", Twist, queue_size=1)
 
         rospy.loginfo("Waiting for action servers...")
         self._wait_for_server(self.move_base_client, "move_base/move")
@@ -107,9 +113,9 @@ class HSRActionManager:
         if not wait:
             return True
 
-        goal_timeout = 120
-        pos_tol = 0.25
-        yaw_tol = 0.26
+        goal_timeout = GOAL_TIMEOUT_SEC
+        pos_tol = POSITION_TOLERANCE_METERS
+        yaw_tol = YAW_TOLERANCE_RAD
 
         start = rospy.Time.now()
         rate = rospy.Rate(10)
@@ -191,8 +197,8 @@ class HSRActionManager:
 
     def emergency_stop(self) -> None:
         self.abort_current = True
-        vel_pub = rospy.Publisher("/hsrb/command_velocity", Twist, queue_size=1)
-        vel_pub.publish(Twist())
+        self._vel_pub.publish(Twist())
+        rospy.sleep(EMERGENCY_PUBLISH_DELAY_SEC)
 
         self.move_base_client.cancel_all_goals()
         self.tts_client.cancel_all_goals()
@@ -200,6 +206,7 @@ class HSRActionManager:
         self.gripper_client.cancel_all_goals()
         self.dock_client.cancel_all_goals()
         rospy.logwarn("Emergency Stop: All actions canceled.")
+        self.abort_current = False
 
 
 __all__ = ["HSRActionManager"]

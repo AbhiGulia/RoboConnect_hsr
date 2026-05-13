@@ -71,13 +71,17 @@ class TaskExecutor:
             wait = self.serial_execution
 
         if cmd == "go_to_location":
-            success = self.action.go_to_location(param, wait=wait)
             if wait:
-                self.translator.publish_state("location", param if success else "failed")
+                result = self.action.go_to_location(param, wait=True)
+                self.translator.publish_state("location", param if result else "failed")
+            else:
+                self.action.go_to_location(param, wait=False)
         elif cmd == "speak":
-            success = self.action.speak(param, wait=wait)
             if wait:
-                self.translator.publish_state("speak", param if success else "aborted")
+                result = self.action.speak(param, wait=True)
+                self.translator.publish_state("speak", param if result else "aborted")
+            else:
+                self.action.speak(param, wait=False)
         elif cmd == "announce":
             self.action.speak(param, wait=False)
             self.translator.publish_state("announce", param)

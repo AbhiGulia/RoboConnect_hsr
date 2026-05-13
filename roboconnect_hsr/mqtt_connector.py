@@ -11,6 +11,8 @@ import rospy
 from .config import RobotConfig
 
 MAX_BACKOFF_SECONDS = 30.0
+MAX_BACKOFF_EXPONENT = 5
+CALLBACK_API_VERSION = mqtt.CallbackAPIVersion.VERSION1  # keep legacy callback signatures
 
 
 class MqttConnector:
@@ -25,7 +27,7 @@ class MqttConnector:
         self._shutdown = False
 
         transport = "websockets" if self.config.protocol == "wss" else "tcp"
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, client_id=self.client_id, transport=transport)
+        self.client = mqtt.Client(CALLBACK_API_VERSION, client_id=self.client_id, transport=transport)
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
 
@@ -118,7 +120,8 @@ class MqttConnector:
 
     @staticmethod
     def _sleep_backoff(attempt: int) -> None:
-        time.sleep(min(MAX_BACKOFF_SECONDS, 2 ** attempt))
+        backoff = 2 ** min(attempt, MAX_BACKOFF_EXPONENT)
+        time.sleep(min(MAX_BACKOFF_SECONDS, backoff))
 
 
 def test_connection(config: RobotConfig, client_id: str, timeout: float = 5.0) -> bool:
