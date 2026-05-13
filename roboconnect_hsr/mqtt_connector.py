@@ -13,7 +13,7 @@ from .config import RobotConfig
 
 MAX_BACKOFF_SECONDS = 30.0
 MAX_BACKOFF_EXPONENT = 5
-CALLBACK_API_VERSION = mqtt.CallbackAPIVersion.VERSION1  # keep 4-arg callbacks for older ROS paho builds
+CALLBACK_API_VERSION = mqtt.CallbackAPIVersion.VERSION1  # keep 4-arg callbacks until signatures migrate
 
 
 class MqttConnector:
@@ -35,7 +35,7 @@ class MqttConnector:
         if self.config.auth_enabled and self.config.username:
             self.client.username_pw_set(self.config.username, self.config.password or "")
 
-        if self.config.protocol in {"ssl", "wss"}:
+        if self.config.protocol in {"tls", "wss"}:
             self.client.tls_set()
             if self.config.protocol == "wss":
                 self.client.ws_set_options(path="/")

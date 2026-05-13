@@ -89,6 +89,11 @@ class HSRActionManager:
     def _make_dock_goal() -> DockChargeStationGoal:
         return DockChargeStationGoal()
 
+    @staticmethod
+    def _angular_distance(current: float, target: float) -> float:
+        """Return the shortest absolute angular distance between two yaw angles."""
+        return abs((current - target + math.pi) % (2 * math.pi) - math.pi)
+
     def go_to_location(self, name: str, wait: bool = True) -> bool:
         coords = self.location_store.get(name)
         if coords is None:
@@ -139,8 +144,7 @@ class HSRActionManager:
             dx = x - coords["x"]
             dy = y - coords["y"]
             dist = (dx**2 + dy**2) ** 0.5
-            # Shortest angular distance with wrap-around at ±pi.
-            dyaw = abs((yaw - coords["yaw"] + math.pi) % (2 * math.pi) - math.pi)
+            dyaw = self._angular_distance(yaw, coords["yaw"])
 
             if dist < pos_tol and dyaw < yaw_tol:
                 self.move_base_client.cancel_goal()

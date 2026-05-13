@@ -43,9 +43,12 @@ class RobotConfig:
 
     @classmethod
     def from_dict(cls, payload: dict) -> RobotConfig:
+        protocol = str(payload["protocol"]).lower()
+        if protocol == "ssl":
+            protocol = "tls"
         return cls(
             robot_name=str(payload["robot_name"]),
-            protocol=str(payload["protocol"]).lower(),
+            protocol=protocol,
             host=str(payload["host"]),
             port=int(payload["port"]),
             auth_enabled=bool(payload.get("auth_enabled", False)),
@@ -147,11 +150,11 @@ class SetupWizard:
 
     @staticmethod
     def _prompt_protocol() -> str:
-        options = {"1": "tcp", "2": "ssl", "3": "wss"}
+        options = {"1": "tcp", "2": "tls", "3": "wss"}
         while True:
             print("Select MQTT protocol:")
             print("  1) tcp")
-            print("  2) ssl (tls)")
+            print("  2) tls (ssl)")
             print("  3) wss")
             choice = input("Choice: ").strip()
             if choice in options:

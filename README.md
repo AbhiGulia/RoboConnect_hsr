@@ -13,7 +13,7 @@ python3 -m roboconnect_hsr.main
 
 On first launch, a setup wizard asks for:
 - Robot name
-- MQTT protocol (tcp / ssl(tls) / wss)
+- MQTT protocol (tcp / tls(ssl) / wss)
 - Broker host and port
 - Authentication (tcp only)
 
