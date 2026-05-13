@@ -21,8 +21,8 @@ class LocationStore:
         try:
             with open(self.filepath, "r", encoding="utf-8") as handle:
                 return json.load(handle)
-        except (OSError, ValueError):
-            rospy.logwarn("Failed to load saved locations, starting with empty list.")
+        except (OSError, ValueError) as exc:
+            rospy.logwarn("Failed to load saved locations (%s). Starting with empty list.", exc)
             return {}
 
     def _persist(self) -> None:

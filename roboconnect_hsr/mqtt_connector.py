@@ -13,7 +13,7 @@ from .config import RobotConfig
 
 MAX_BACKOFF_SECONDS = 30.0
 MAX_BACKOFF_EXPONENT = 5
-CALLBACK_API_VERSION = mqtt.CallbackAPIVersion.VERSION1  # keep legacy callback signatures
+CALLBACK_API_VERSION = mqtt.CallbackAPIVersion.VERSION1  # keep 4-arg callbacks for older ROS paho builds
 
 
 class MqttConnector:

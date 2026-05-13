@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import getpass
 import json
 import os
-import getpass
+from dataclasses import dataclass
 
 CONFIG_VERSION = 1
 DEFAULT_DATA_DIR = os.path.expanduser("~/.roboconnect_hsr")

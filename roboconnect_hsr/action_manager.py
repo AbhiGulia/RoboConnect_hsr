@@ -25,7 +25,7 @@ EMERGENCY_PUBLISH_DELAY_SEC = 0.1
 class HSRActionManager:
     def __init__(self, location_store):
         self.location_store = location_store
-        self.abort_current = False
+        self.abort_in_progress = False
 
         self.move_base_client = actionlib.SimpleActionClient("move_base/move", MoveBaseAction)
         self.tts_client = actionlib.SimpleActionClient("/talk_request_action", TalkRequestAction)
@@ -121,7 +121,7 @@ class HSRActionManager:
         rate = rospy.Rate(10)
 
         while not rospy.is_shutdown():
-            if self.abort_current:
+            if self.abort_in_progress:
                 self.move_base_client.cancel_goal()
                 return False
 
@@ -139,6 +139,7 @@ class HSRActionManager:
             dx = x - coords["x"]
             dy = y - coords["y"]
             dist = (dx**2 + dy**2) ** 0.5
+            # Shortest angular distance with wrap-around at ±pi.
             dyaw = abs((yaw - coords["yaw"] + math.pi) % (2 * math.pi) - math.pi)
 
             if dist < pos_tol and dyaw < yaw_tol:
@@ -161,7 +162,7 @@ class HSRActionManager:
 
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
-            if self.abort_current:
+            if self.abort_in_progress:
                 self.tts_client.cancel_goal()
                 return False
 
@@ -196,7 +197,7 @@ class HSRActionManager:
         return self.dock_client.get_state() == actionlib.GoalStatus.SUCCEEDED
 
     def emergency_stop(self) -> None:
-        self.abort_current = True
+        self.abort_in_progress = True
         self._vel_pub.publish(Twist())
         rospy.sleep(EMERGENCY_PUBLISH_DELAY_SEC)
 
@@ -206,7 +207,7 @@ class HSRActionManager:
         self.gripper_client.cancel_all_goals()
         self.dock_client.cancel_all_goals()
         rospy.logwarn("Emergency Stop: All actions canceled.")
-        self.abort_current = False
+        self.abort_in_progress = False
 
 
 __all__ = ["HSRActionManager"]

@@ -175,7 +175,7 @@ class HomeAssistantTranslator(DeviceTranslator):
         self.device_name = device_name
 
     def _topic_base(self, cfg: EntityConfig) -> str:
-        unique = f"{self.device_id}_--_{cfg.unique_id}"
+        unique = f"{self.device_id}_--_{cfg.unique_id}"  # Temi-style delimiter for compatibility
         return f"{self.base_topic}/{cfg.platform}/{unique}"
 
     def publish_discovery(self) -> None:
