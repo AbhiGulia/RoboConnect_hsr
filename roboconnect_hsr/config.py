@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import getpass
 import json
 import os
+import getpass
 
 CONFIG_VERSION = 1
 DEFAULT_DATA_DIR = os.path.expanduser("~/.roboconnect_hsr")
@@ -42,7 +42,7 @@ class RobotConfig:
         }
 
     @classmethod
-    def from_dict(cls, payload: dict) -> "RobotConfig":
+    def from_dict(cls, payload: dict) -> RobotConfig:
         return cls(
             robot_name=str(payload["robot_name"]),
             protocol=str(payload["protocol"]).lower(),

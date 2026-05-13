@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import threading
 import time
+from collections.abc import Callable
 
 import paho.mqtt.client as mqtt
 import rospy
@@ -23,7 +24,7 @@ class MqttConnector:
         self.connected = False
         self._connected_event = threading.Event()
         self._lock = threading.Lock()
-        self._subscriptions: dict[str, tuple[int, callable]] = {}
+        self._subscriptions: dict[str, tuple[int, Callable]] = {}
         self._shutdown = False
 
         transport = "websockets" if self.config.protocol == "wss" else "tcp"
@@ -76,7 +77,7 @@ class MqttConnector:
         except Exception as exc:
             rospy.logwarn("MQTT publish failed for %s: %s", topic, exc)
 
-    def subscribe(self, topic: str, callback, qos: int = 2) -> None:
+    def subscribe(self, topic: str, callback: Callable, qos: int = 2) -> None:
         with self._lock:
             self._subscriptions[topic] = (qos, callback)
         self.client.subscribe(topic, qos=qos)

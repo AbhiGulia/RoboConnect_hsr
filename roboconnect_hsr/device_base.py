@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 
 
 class DeviceTranslator(ABC):
@@ -15,7 +16,7 @@ class DeviceTranslator(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def subscribe_all_commands(self, callback) -> None:
+    def subscribe_all_commands(self, callback: Callable) -> None:
         raise NotImplementedError
 
     @abstractmethod
