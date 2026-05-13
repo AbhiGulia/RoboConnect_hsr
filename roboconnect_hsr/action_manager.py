@@ -118,10 +118,6 @@ class HSRActionManager:
         if not wait:
             return True
 
-        goal_timeout = GOAL_TIMEOUT_SEC
-        pos_tol = POSITION_TOLERANCE_METERS
-        yaw_tol = YAW_TOLERANCE_RAD
-
         start = rospy.Time.now()
         rate = rospy.Rate(10)
 
@@ -146,11 +142,11 @@ class HSRActionManager:
             dist = (dx**2 + dy**2) ** 0.5
             dyaw = self._angular_distance(yaw, coords["yaw"])
 
-            if dist < pos_tol and dyaw < yaw_tol:
+            if dist < POSITION_TOLERANCE_METERS and dyaw < YAW_TOLERANCE_RAD:
                 self.move_base_client.cancel_goal()
                 return True
 
-            if (rospy.Time.now() - start).to_sec() > goal_timeout:
+            if (rospy.Time.now() - start).to_sec() > GOAL_TIMEOUT_SEC:
                 self.move_base_client.cancel_goal()
                 return False
 

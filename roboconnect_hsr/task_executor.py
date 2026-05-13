@@ -57,7 +57,7 @@ class TaskExecutor:
             try:
                 self._execute_single(task)
             except Exception as exc:
-                rospy.logerr("Task %s failed: %s", task.command, exc)
+                rospy.logerr("Task %s(%s) failed: %s", task.command, task.param, exc)
 
     def _execute_single(self, task: Task) -> None:
         cmd = task.command
