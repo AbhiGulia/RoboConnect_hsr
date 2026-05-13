@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import queue as queue_module
 import threading
+from typing import Any
 
 import rospy
 
@@ -12,7 +13,7 @@ class Task:
     _seq = 0
     _lock = threading.Lock()
 
-    def __init__(self, command: str, param, priority: int = 0):
+    def __init__(self, command: str, param: Any, priority: int = 0):
         self.command = command
         self.param = param
         self.priority = priority
@@ -43,9 +44,12 @@ class TaskExecutor:
             rospy.loginfo("Serial execution: %s", "ON" if self.serial_execution else "OFF")
         self.translator.publish_state("serial_execution", "ON" if enabled else "OFF")
 
-    def enqueue(self, command: str, param, emergency: bool = False) -> None:
+    def enqueue(self, command: str, param: Any, emergency: bool = False) -> None:
         task = Task(command, param, 10 if emergency else 0)
         self.queue.put(task)
+
+    def has_pending_tasks(self) -> bool:
+        return not self.queue.empty()
 
     def _run(self) -> None:
         while True:

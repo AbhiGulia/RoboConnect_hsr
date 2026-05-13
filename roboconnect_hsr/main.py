@@ -102,7 +102,7 @@ class RoboConnectHSR:
             pose = self.action_mgr.current_pose.pose.position
             self.translator.publish_state("position_x", f"{pose.x:.3f}")
             self.translator.publish_state("position_y", f"{pose.y:.3f}")
-        busy = not self.executor.queue.empty() or self.action_mgr.abort_current
+        busy = self.executor.has_pending_tasks() or self.action_mgr.abort_current
         self.translator.publish_state("busy", "ON" if busy else "OFF")
 
     def shutdown(self):

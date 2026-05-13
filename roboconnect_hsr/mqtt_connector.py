@@ -10,6 +10,8 @@ import rospy
 
 from .config import RobotConfig
 
+MAX_BACKOFF_SECONDS = 30.0
+
 
 class MqttConnector:
     def __init__(self, config: RobotConfig, client_id: str, availability_topic: str | None = None):
@@ -116,7 +118,7 @@ class MqttConnector:
 
     @staticmethod
     def _sleep_backoff(attempt: int) -> None:
-        time.sleep(min(30.0, 2 ** attempt))
+        time.sleep(min(MAX_BACKOFF_SECONDS, 2 ** attempt))
 
 
 def test_connection(config: RobotConfig, client_id: str, timeout: float = 5.0) -> bool:

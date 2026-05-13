@@ -6,7 +6,6 @@ from dataclasses import dataclass
 import getpass
 import json
 import os
-from typing import Optional
 
 CONFIG_VERSION = 1
 DEFAULT_DATA_DIR = os.path.expanduser("~/.roboconnect_hsr")
@@ -23,8 +22,8 @@ class RobotConfig:
     host: str
     port: int
     auth_enabled: bool
-    username: Optional[str] = None
-    password: Optional[str] = None
+    username: str | None = None
+    password: str | None = None
 
     @property
     def device_id(self) -> str:
@@ -60,7 +59,7 @@ class ConfigStore:
         self.data_dir = data_dir
         self.path = os.path.join(self.data_dir, "config.json")
 
-    def load(self) -> Optional[RobotConfig]:
+    def load(self) -> RobotConfig | None:
         if not os.path.exists(self.path):
             return None
         try:

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import rospy
 import actionlib
 from std_msgs.msg import Bool
@@ -131,7 +133,7 @@ class HSRActionManager:
             dx = x - coords["x"]
             dy = y - coords["y"]
             dist = (dx**2 + dy**2) ** 0.5
-            dyaw = abs((yaw - coords["yaw"] + 3.14159) % (2 * 3.14159) - 3.14159)
+            dyaw = abs((yaw - coords["yaw"] + math.pi) % (2 * math.pi) - math.pi)
 
             if dist < pos_tol and dyaw < yaw_tol:
                 self.move_base_client.cancel_goal()
